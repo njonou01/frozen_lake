@@ -7,35 +7,18 @@ import edu.upec.episen.ing2.logique.service.board.BoardCursor;
 public class ManhattanStrategy implements Strategy {
   @Override
   public BoardAction righAction(Board board) {
-
-    BoardAction bestAction = BoardAction.BOTTOM;
-    Integer min = Integer.MAX_VALUE;
-
-    for (BoardAction action : board.getAvailableActions()) {
-
-      Integer dist = computeDistance(action, board.getCursor(), board.getGoalCursor());
-
-      if (dist < min) {
-        min = dist;
-        bestAction = action;
-      }
-    }
-
-    return bestAction;
+    return board.getAvailableActions().stream()
+        .min((a1, a2) -> computeDistance(a1, board.getCursor(), board.getGoalCursor())
+            .compareTo(computeDistance(a2, board.getCursor(), board.getGoalCursor())))
+        .orElseThrow(() -> new IllegalStateException("No available actions"));
   }
 
   private Integer computeDistance(BoardAction action, BoardCursor cursor, BoardCursor reference) {
-    switch (action) {
-      case TOP:
-        return cursor.findDistanceIncreaseRowWith(reference);
-      case BOTTOM:
-        return cursor.findDistanceDecreaseRowWith(reference);
-      case RIGHT:
-        return cursor.findDistanceIncreaseColWith(reference);
-      case LEFT:
-        return cursor.findDistanceDecreaseColWith(reference);
-    }
-    throw new IllegalArgumentException("Impossible d'avoir ca comme valeur");
+    return switch (action) {
+      case TOP -> cursor.findDistanceIncreaseRowWith(reference);
+      case BOTTOM -> cursor.findDistanceDecreaseRowWith(reference);
+      case RIGHT -> cursor.findDistanceIncreaseColWith(reference);
+      case LEFT -> cursor.findDistanceDecreaseColWith(reference);
+    };
   }
-
 }

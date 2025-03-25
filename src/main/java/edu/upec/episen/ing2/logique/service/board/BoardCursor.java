@@ -36,4 +36,9 @@ public record BoardCursor(Integer row, Integer col) {
   public Integer findDistanceDecreaseColWith(BoardCursor cursor) {
     return Math.abs(row() - cursor.row()) + Math.abs((col() - 1) - cursor.col());
   }
+
+  @Override
+  public String toString() {
+    return String.format("BoardCursor(row=%d, col=%d)", row + 1, col + 1);
+  }
 }

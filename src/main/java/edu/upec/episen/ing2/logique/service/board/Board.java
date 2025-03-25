@@ -4,7 +4,7 @@ import java.util.EnumSet;
 import java.util.Set;
 
 import edu.upec.episen.ing2.logique.service.GameStatus;
-import edu.upec.episen.utils.BoardPrintUtils;
+import edu.upec.episen.utils.Utils;
 
 public class Board {
   private final int size;
@@ -13,12 +13,11 @@ public class Board {
   private final BoardCursor goalCursor;
   private GameStatus gameStatus;
 
-  public Board(String[][] table) throws Exception {
+  public Board(String[][] table) {
     this.size = table.length;
     this.gameStatus = GameStatus.ONGOING;
     this.board = new BoardState[size][size];
     BoardCursor tempGoalCursor = null;
-
     for (int i = 0; i < size; i++) {
       for (int j = 0; j < size; j++) {
         board[i][j] = BoardState.toBoadState(table[i][j]);
@@ -48,10 +47,7 @@ public class Board {
     }
   }
 
-  public void go(BoardAction action) {
-    if (!canContinue())
-      return;
-
+  private BoardCursor getNewPosition(BoardAction action) {
     int newRow = cursor.row();
     int newCol = cursor.col();
 
@@ -70,7 +66,14 @@ public class Board {
         break;
     }
 
-    cursor = new BoardCursor(newRow, newCol);
+    return new BoardCursor(newRow, newCol);
+  }
+
+  public void go(BoardAction action) {
+    if (!canContinue())
+      return;
+
+    cursor = getNewPosition(action);
     updateStatus();
   }
 
@@ -91,30 +94,8 @@ public class Board {
     return actions;
   }
 
-  public boolean isHoleAction(BoardAction action) {
-    int newX = this.cursor.col();
-    int newY = this.cursor.row();
-
-    switch (action) {
-      case TOP:
-        newX--;
-        break;
-      case BOTTOM:
-        newX++;
-        break;
-      case LEFT:
-        newY--;
-        break;
-      case RIGHT:
-        newY++;
-        break;
-    }
-
-    return board[newX][newY] == BoardState.HOLE;
-  }
-
   public void print() {
-    BoardPrintUtils.printBoard(board, cursor);
+    Utils.printBoard(board, cursor);
   }
 
   public BoardState getCurrentBoardState() {
@@ -139,5 +120,10 @@ public class Board {
 
   public BoardState[][] getBoard() {
     return board;
+  }
+
+  public boolean isHoleAction(BoardAction action) {
+    BoardCursor newPosition = getNewPosition(action);
+    return board[newPosition.row()][newPosition.col()] == BoardState.HOLE;
   }
 }

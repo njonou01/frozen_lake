@@ -18,7 +18,7 @@ public class FrozenLake {
   };
 
   private static final Random RANDOM = new Random();
-  private static final double SLIP_PROBABILITY = 0.1;
+  private static final double SLIP_PROBABILITY = 0.20;
 
   private Strategy strategy;
   private Board board;
@@ -58,12 +58,9 @@ public class FrozenLake {
     Set<BoardAction> availableActions = board.getAvailableActions();
     BoardAction bestAction = strategy.righAction(board);
     availableActions.remove(bestAction);
-    availableActions.remove(bestAction.getOpposite());
 
-    Boolean isSlip = RANDOM.nextDouble() < SLIP_PROBABILITY;
-    BoardAction selectedAction = isSlip
-        ? availableActions.stream().toList()
-            .get(RANDOM.nextInt(availableActions.size()))
+    BoardAction selectedAction = RANDOM.nextDouble() < SLIP_PROBABILITY
+        ? availableActions.stream().toList().get(RANDOM.nextInt(availableActions.size()))
         : bestAction;
 
     board.go(selectedAction);
